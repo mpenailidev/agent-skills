@@ -1,0 +1,3 @@
+interface:
+  display_name: "Columnar Code Formatter"
+  short_description: "Strict human-first alignment for code blocks"
