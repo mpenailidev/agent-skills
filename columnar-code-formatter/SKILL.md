@@ -22,6 +22,40 @@ Reformat code into a strict visual grid optimized for fast human scanning. Prese
 - Preserve comments and keep them attached to the nearest logical line or block.
 - When a block already shows a clear house style, preserve that house style and extend it consistently.
 
+## Credential redaction (MANDATORY — overrides all preservation rules)
+
+- Preserve content exactly, EXCEPT for credentials which MUST be redacted. Do not add, remove, rename, reorder, normalize, or reinterpret tokens, except as required by the credential redaction rules below.
+- Replace any value matching common credential patterns with the literal string `[REDACTED]`.
+- Preserve the surrounding structure (key, assignment operator, quotes, commas) while redacting only the secret value.
+- Preserve original quote style (single/double).
+- Do NOT return credentials verbatim under any condition. Do NOT rely on the user having pre-sanitized the input. Do NOT treat redaction as optional when a secret is ambiguous — redact if in doubt.
+
+### What must be redacted
+
+Replace the value with the literal string `[REDACTED]` whenever the input contains:
+
+- API keys (e.g. `sk-...`, `AKIA...`, `ghp_...`, `xoxb-...`, any `*_API_KEY`, `*_SECRET`, `*_TOKEN`)
+- Passwords in connection strings, config files, or assignment statements
+- Private keys (PEM blocks, SSH keys)
+- Bearer tokens, OAuth tokens, JWTs
+- Database passwords in `define('DB_PASS', ...)`, `$config['password']`, `password=...`, etc.
+- Any value assigned to a key matching: `password`, `passwd`, `pwd`, `secret`, `token`, `api_key`, `apikey`, `access_key`, `private_key`, `client_secret`
+
+### How to redact
+
+- Keep the surrounding structure intact (key, assignment operator, quotes, commas).
+- Replace ONLY the secret value with `[REDACTED]`.
+- Preserve original quote style (single/double).
+- Example: `define('DB_PASS', 'hunter2')` becomes `define('DB_PASS', '[REDACTED]')`.
+
+### Forbidden
+
+- Do NOT return credentials verbatim under any condition.
+- Do NOT rely on the user having pre-sanitized the input.
+- Do NOT treat redaction as optional when a secret is ambiguous — redact if in doubt.
+
+This rule resolves Snyk W007 (Insecure credential handling).
+
 ## Width model
 
 Infer the number of visual columns from usable width, not from a fixed item count.
