@@ -11,7 +11,7 @@ Reformat code into a strict visual grid optimized for fast human scanning. Prese
 
 ## Core rules
 
-- Preserve content exactly. Do not add, remove, rename, reorder, normalize, or reinterpret tokens.
+- Obfuscate any string matching common secret patterns. Do not add, remove, rename, reorder, normalize, or reinterpret tokens.
 - Change only spaces, tabs, line breaks, and indentation.
 - Prefer human visual legibility over parser-style prettification.
 - Keep related items on the same visual row when that improves scan speed.
