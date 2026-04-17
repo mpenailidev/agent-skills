@@ -3,11 +3,20 @@ name: columnar-code-formatter
 description: enforce strict human-first columnar indentation for code and data-like code blocks. use when a user wants code reformatted without changing logic, especially sql, php arrays, define blocks, shell variable maps, or similar aligned structures. apply when commas or and must start lines, tabs after commas must be preserved, closing parentheses must align visually, and the formatter must infer 2 to 5 columns from usable screen width, font size, and nesting depth.
 ---
 
+## Credential redaction (MANDATORY — overrides all preservation rules)
+
+- Preserve content exactly, EXCEPT for credentials which MUST be redacted. Do not add, remove, rename, reorder, normalize, or reinterpret tokens, except as required by the credential redaction rules below.
+- Replace any value matching common credential patterns with the literal string `[REDACTED]`.
+- Preserve the surrounding structure (key, assignment operator, quotes, commas) while redacting only the secret value.
+- Preserve original quote style (single/double).
+- Do NOT return credentials verbatim under any condition. Do NOT rely on the user having pre-sanitized the input. Do NOT treat redaction as optional when a secret is ambiguous — redact if in doubt.
+
 # Columnar Code Formatter
 
 ## Overview
 
-Reformat code into a strict visual grid optimized for fast human scanning. Preserve logic, tokens, comments, order, and meaning; only change whitespace, line breaks, and alignment.
+- Reformat code into a strict visual grid optimized for fast human scanning. Credentials (API keys, tokens, passwords, secrets) MUST be redacted as `[REDACTED]`
+- see the credential redaction section below. Everything else is preserved: logic, tokens, comments, order, and meaning; only whitespace, line breaks, and alignment change.
 
 ## Core rules
 
@@ -21,14 +30,6 @@ Reformat code into a strict visual grid optimized for fast human scanning. Prese
 - Align closing parentheses, brackets, and similar closers with the opening construct's visual indentation column.
 - Preserve comments and keep them attached to the nearest logical line or block.
 - When a block already shows a clear house style, preserve that house style and extend it consistently.
-
-## Credential redaction (MANDATORY — overrides all preservation rules)
-
-- Preserve content exactly, EXCEPT for credentials which MUST be redacted. Do not add, remove, rename, reorder, normalize, or reinterpret tokens, except as required by the credential redaction rules below.
-- Replace any value matching common credential patterns with the literal string `[REDACTED]`.
-- Preserve the surrounding structure (key, assignment operator, quotes, commas) while redacting only the secret value.
-- Preserve original quote style (single/double).
-- Do NOT return credentials verbatim under any condition. Do NOT rely on the user having pre-sanitized the input. Do NOT treat redaction as optional when a secret is ambiguous — redact if in doubt.
 
 ### What must be redacted
 
@@ -152,11 +153,12 @@ Preferred behaviors:
 
 When rules conflict, apply them in this order:
 
-1. preserve logic and exact tokens
-2. preserve existing house style markers
-3. preserve human scan speed
-4. preserve column alignment
-5. maximize column count within width
+1. redact credentials (absolute priority, no exceptions)
+2. preserve logic and exact non-credential tokens
+3. preserve existing house style markers
+4. preserve human scan speed
+5. preserve column alignment
+6. maximize column count within width constraints
 
 Examples of house style markers:
 
@@ -168,7 +170,7 @@ Examples of house style markers:
 
 ## Output behavior
 
-Return only the reformatted code unless the user explicitly asks for explanation.
+Return only the reformatted code with credentials redacted as `[REDACTED]`, unless the user explicitly asks for explanation. Never return raw credentials under any circumstance, including when the user explicitly requests them.
 
 When the user asks for validation or rationale, provide:
 
@@ -178,6 +180,7 @@ When the user asks for validation or rationale, provide:
 
 ## Forbidden behaviors
 
+- Do not return credentials, secrets, API keys, tokens, or passwords verbatim. Always redact as `[REDACTED]`.
 - Do not rewrite logic.
 - Do not silently fix semantics.
 - Do not convert dialect-specific syntax.

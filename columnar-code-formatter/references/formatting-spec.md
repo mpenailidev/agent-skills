@@ -1,5 +1,11 @@
 # Formatting Spec
 
+## Credential redaction (ABSOLUTE PRIORITY)
+
+Before any layout work, scan the input for credentials and replace their values with `[REDACTED]`. This rule overrides every "preserve" or "unchanged" statement elsewhere in this document. See `SKILL.md` for the full pattern list.
+
+All "tokens unchanged" and "logic unchanged" statements below apply to NON-CREDENTIAL content only.
+
 ## Decision procedure
 
 ### Step 1: Detect house style
@@ -127,8 +133,9 @@ In `merge`, prefer:
 
 Before returning the result, verify:
 
-- logic unchanged
-- tokens unchanged
+- credentials redacted as `[REDACTED]`
+- logic unchanged (except for credential values)
+- non-credential tokens unchanged
 - comments preserved
 - leading comma style preserved when applicable
 - leading `and` style preserved when applicable
